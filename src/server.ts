@@ -9,6 +9,8 @@ app.get("/hello", async () => {
   return tables;
 });
 
+app.post("/users", async () => {});
+
 app
   .listen({
     port: 3333,
