@@ -1,15 +1,14 @@
 import fastify from "fastify";
-import { knex } from "./database";
+import { usersRoutes } from "./routes/user-routes";
+import cookie from "@fastify/cookie";
 
 const app = fastify();
 
-app.get("/hello", async () => {
-  const tables = await knex("sqlite_schema").select("*");
+app.register(cookie);
 
-  return tables;
+app.register(usersRoutes, {
+  prefix: "/users",
 });
-
-app.post("/users", async () => {});
 
 app
   .listen({
