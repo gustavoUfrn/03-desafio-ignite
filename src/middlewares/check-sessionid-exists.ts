@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 
-export function checkSessionIdExist(
+export async function checkSessionIdExist(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
