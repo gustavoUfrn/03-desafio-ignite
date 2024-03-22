@@ -5,8 +5,16 @@ import { z } from "zod";
 import { randomUUID } from "crypto";
 
 export async function mealsRoutes(app: FastifyInstance) {
-  app.get("/", async () => {
+  app.get("/admin", async () => {
     const allMeals = await knex("meals").select("*");
+
+    return { allMeals };
+  });
+
+  app.get("/", { preHandler: [checkSessionIdExist] }, async (request) => {
+    const { sessionId } = request.cookies;
+
+    const allMeals = await knex("meals").where("user_id", sessionId);
 
     return { allMeals };
   });
@@ -15,7 +23,7 @@ export async function mealsRoutes(app: FastifyInstance) {
     "/",
     { preHandler: [checkSessionIdExist] },
     async (request, reply) => {
-      const sessionId = request.cookies;
+      const { sessionId } = request.cookies;
 
       const createBodySchema = z.object({
         name: z.string(),
