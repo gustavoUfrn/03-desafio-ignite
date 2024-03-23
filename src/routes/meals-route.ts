@@ -19,6 +19,49 @@ export async function mealsRoutes(app: FastifyInstance) {
     return { allMeals };
   });
 
+  app.get(
+    "/totalmeals",
+    { preHandler: [checkSessionIdExist] },
+    async (request, reply) => {
+      const { sessionId } = request.cookies;
+
+      const totalmeals = (await knex("meals").where("user_id", sessionId))
+        .length;
+
+      const totalmealsondiet = await knex("meals")
+        .where("user_id", sessionId)
+        .sum("is_on_diet", { as: "amount" });
+
+      return reply.status(201).send({
+        "Total meals": totalmeals,
+        "Total meals on diet": totalmealsondiet,
+      });
+    },
+  );
+
+  app.get(
+    "/:id",
+    { preHandler: [checkSessionIdExist] },
+    async (request, reply) => {
+      const { sessionId } = request.cookies;
+
+      const getMealsParamsSchema = z.object({
+        id: z.string().uuid(),
+      });
+
+      const { id } = getMealsParamsSchema.parse(request.params);
+
+      const especificMeal = await knex("meals")
+        .where({
+          id,
+          user_id: sessionId,
+        })
+        .first();
+
+      return reply.status(201).send({ especificMeal });
+    },
+  );
+
   app.post(
     "/",
     { preHandler: [checkSessionIdExist] },
