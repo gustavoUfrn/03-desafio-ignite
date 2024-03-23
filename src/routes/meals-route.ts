@@ -81,13 +81,14 @@ export async function mealsRoutes(app: FastifyInstance) {
       const totalmeals = (await knex("meals").where("user_id", sessionId))
         .length;
 
-      const totalmealsondiet = await knex("meals")
+      const totalmealsondiet: number = await knex("meals")
         .where("user_id", sessionId)
-        .sum("is_on_diet", { as: "amount" });
+        .sum("is_on_diet");
 
       return reply.status(201).send({
         "Total meals": totalmeals,
         "Total meals on diet": totalmealsondiet,
+        "Total meals off diet": totalmealsondiet - totalmeals,
       });
     },
   );
@@ -115,6 +116,47 @@ export async function mealsRoutes(app: FastifyInstance) {
         return reply.status(401).send();
       }
 
+      return reply.status(204).send();
+    },
+  );
+  // Deve ser capaz de alterar os dados de uma refeição
+  app.patch(
+    "/:id",
+    { preHandler: [checkSessionIdExist] },
+    async (request, reply) => {
+      const { sessionId } = request.cookies;
+
+      const idMealShcema = z.object({
+        id: z.string().uuid(),
+      });
+
+      const { id } = idMealShcema.parse(request.params);
+
+      const updateBodyShecma = z.object({
+        name: z.string(),
+        description: z.string(),
+        isOnDiet: z.boolean(),
+      });
+
+      const { name, description, isOnDiet } = updateBodyShecma.parse(
+        request.body,
+      );
+
+      const updateMealInfo = await knex("meals")
+        .where({
+          id,
+          user_id: sessionId,
+        })
+        .update({
+          name,
+          description,
+          is_on_diet: isOnDiet,
+          date: Date.now(),
+        });
+
+      if (!updateMealInfo) {
+        return reply.status(401).send();
+      }
       return reply.status(204).send();
     },
   );
