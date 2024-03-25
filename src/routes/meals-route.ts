@@ -160,4 +160,37 @@ export async function mealsRoutes(app: FastifyInstance) {
       return reply.status(204).send();
     },
   );
+  app.get(
+    "/metricstestroute/:id",
+    { preHandler: [checkSessionIdExist] },
+    async (request, reply) => {
+      const { sessionId } = request.cookies;
+
+      const totalmeals = await knex("meals")
+        .where({
+          user_id: sessionId,
+        })
+        .count("is_on_diet", { as: "amount" });
+
+      const totalmealsOffDiet = await knex("meals")
+        .where({
+          user_id: sessionId,
+          is_on_diet: false,
+        })
+        .count("is_on_diet", { as: "amount" });
+
+      const totalmealsOnDiet = await knex("meals")
+        .where({
+          user_id: sessionId,
+          is_on_diet: true,
+        })
+        .sum("is_on_diet", { as: "amount" });
+
+      return reply.status(201).send({
+        "Total meals: ": totalmeals,
+        "Total meals off diet:": totalmealsOffDiet,
+        "Total meals on diet:": totalmealsOnDiet,
+      });
+    },
+  );
 }
