@@ -1,3 +1,4 @@
+// Deve ser possivel identificar o user entre as requisições
 import { FastifyReply, FastifyRequest } from "fastify";
 
 export async function checkSessionIdExist(

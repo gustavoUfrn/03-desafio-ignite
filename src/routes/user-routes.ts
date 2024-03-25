@@ -4,12 +4,12 @@ import { randomUUID } from "crypto";
 import { z } from "zod";
 
 export async function usersRoutes(app: FastifyInstance) {
-  app.get("/admin", async () => {
-    const users = await knex("users").select("*");
+  // app.get("/admin", async () => {
+  //   const users = await knex("users").select("*");
 
-    return { users };
-  });
-
+  //   return { users };
+  // });
+  // Deve ser possivel criar um user
   app.post("/", async (request, reply) => {
     const createBodySchema = z.object({
       name: z.string(),
