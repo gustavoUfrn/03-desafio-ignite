@@ -1,5 +1,6 @@
 // Deve ser possivel identificar o user entre as requisições
 import { FastifyReply, FastifyRequest } from "fastify";
+import knex from "knex";
 
 export async function checkSessionIdExist(
   request: FastifyRequest,
@@ -12,4 +13,12 @@ export async function checkSessionIdExist(
       error: "unathorized",
     });
   }
+
+  const user = await knex("users").where({ session_id: sessionId }).first();
+
+  if (!user) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  request.user = user;
 }

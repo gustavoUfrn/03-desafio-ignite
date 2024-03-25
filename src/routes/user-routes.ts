@@ -4,16 +4,10 @@ import { randomUUID } from "crypto";
 import { z } from "zod";
 
 export async function usersRoutes(app: FastifyInstance) {
-  // app.get("/admin", async () => {
-  //   const users = await knex("users").select("*");
-
-  //   return { users };
-  // });
-  // Deve ser possivel criar um user
   app.post("/", async (request, reply) => {
     const createBodySchema = z.object({
       name: z.string(),
-      email: z.string(),
+      email: z.string().email(),
     });
 
     const { name, email } = createBodySchema.parse(request.body);
@@ -27,6 +21,12 @@ export async function usersRoutes(app: FastifyInstance) {
         path: "/",
         maxAge: 60 * 60 * 24 * 7,
       });
+    }
+
+    const userByEmail = await knex("users").where({ email }).first();
+
+    if (userByEmail) {
+      return reply.status(400).send({ message: "User already exist!" });
     }
 
     await knex("users").insert({

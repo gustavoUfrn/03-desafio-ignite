@@ -5,13 +5,39 @@ import { z } from "zod";
 import { randomUUID } from "crypto";
 
 export async function mealsRoutes(app: FastifyInstance) {
+  app.post(
+    "/",
+    { preHandler: [checkSessionIdExist] },
+    async (request, reply) => {
+      const { sessionId } = request.cookies;
+
+      const createBodySchema = z.object({
+        name: z.string(),
+        description: z.string(),
+        isOnDiet: z.boolean(),
+      });
+
+      const { name, description, isOnDiet } = createBodySchema.parse(
+        request.body,
+      );
+
+      await knex("meals").insert({
+        id: randomUUID(),
+        user_id: sessionId,
+        name,
+        description,
+        is_on_diet: isOnDiet,
+        date: Date.now(),
+      });
+
+      return reply.status(201).send();
+    },
+  );
   // Deve ser possivel visualizar uma unica refeição
   app.get(
     "/:id",
     { preHandler: [checkSessionIdExist] },
     async (request, reply) => {
-      const { sessionId } = request.cookies;
-
       const getMealsParamsSchema = z.object({
         id: z.string().uuid(),
       });
@@ -21,9 +47,12 @@ export async function mealsRoutes(app: FastifyInstance) {
       const especificMeal = await knex("meals")
         .where({
           id,
-          user_id: sessionId,
         })
         .first();
+
+      if (especificMeal) {
+        return reply.status(400).send({ error: "Meal not found" });
+      }
 
       return reply.status(201).send({ especificMeal });
     },
@@ -32,7 +61,9 @@ export async function mealsRoutes(app: FastifyInstance) {
   app.get("/", { preHandler: [checkSessionIdExist] }, async (request) => {
     const { sessionId } = request.cookies;
 
-    const allMeals = await knex("meals").where("user_id", sessionId);
+    const allMeals = await knex("meals")
+      .where("user_id", sessionId)
+      .orderBy("date");
 
     return { allMeals };
   });
@@ -68,36 +99,6 @@ export async function mealsRoutes(app: FastifyInstance) {
         "Total meals off diet:": totalmealsOffDiet,
         "Total meals on diet:": totalmealsOnDiet,
       });
-    },
-  );
-
-  // Deve ser possivel registrar uma refeições
-  app.post(
-    "/",
-    { preHandler: [checkSessionIdExist] },
-    async (request, reply) => {
-      const { sessionId } = request.cookies;
-
-      const createBodySchema = z.object({
-        name: z.string(),
-        description: z.string(),
-        isOnDiet: z.boolean(),
-      });
-
-      const { name, description, isOnDiet } = createBodySchema.parse(
-        request.body,
-      );
-
-      await knex("meals").insert({
-        id: randomUUID(),
-        user_id: sessionId,
-        name,
-        description,
-        is_on_diet: isOnDiet,
-        date: Date.now(),
-      });
-
-      return reply.status(201).send();
     },
   );
   // Deve ser capaz de alterar os dados de uma refeição
