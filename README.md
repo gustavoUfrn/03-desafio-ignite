@@ -44,5 +44,6 @@ O banco de dados para o desenvolvimento do projeto é o SQLite, um banco de dado
 >A estratégia de conexão usada será o query builder **Knex.js**, sendo atualmente o query builder mais famoso para o node. Ele facilita a escrita dos SQL's utilizando código Js em sua sintaxe.
 ### Zod - Validação de dados
 Zod é um biblioteca de validação de dados, além de validar a presença de dados, é possível validar o tipo do dado recebido. Ela será usada para validar se dados foram recebidos e não e também para validar os dados que foram recebidos do front-end.
-
+###Insomnia
+Insomnia é um aplicativo de desktop que server para fazer design, testes e requisições para a sua API. Usaremos principalmente nos testes de rotas que seram feitas durante e depois o desenvolvimento de projeto.
 
