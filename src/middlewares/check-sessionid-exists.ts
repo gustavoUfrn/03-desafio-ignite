@@ -1,6 +1,6 @@
 // Deve ser possivel identificar o user entre as requisições
 import { FastifyReply, FastifyRequest } from "fastify";
-import knex from "knex";
+import { knex } from "../database";
 
 export async function checkSessionIdExist(
   request: FastifyRequest,
