@@ -50,7 +50,7 @@ export async function mealsRoutes(app: FastifyInstance) {
         })
         .first();
 
-      if (especificMeal) {
+      if (!especificMeal) {
         return reply.status(400).send({ error: "Meal not found" });
       }
 
@@ -102,7 +102,7 @@ export async function mealsRoutes(app: FastifyInstance) {
     },
   );
   // Deve ser capaz de alterar os dados de uma refeição
-  app.patch(
+  app.put(
     "/:id",
     { preHandler: [checkSessionIdExist] },
     async (request, reply) => {
