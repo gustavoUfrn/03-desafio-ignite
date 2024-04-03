@@ -33,7 +33,6 @@ export async function mealsRoutes(app: FastifyInstance) {
       return reply.status(201).send();
     },
   );
-  // Deve ser possivel visualizar uma unica refeição
   app.get(
     "/:id",
     { preHandler: [checkSessionIdExist] },
@@ -57,7 +56,6 @@ export async function mealsRoutes(app: FastifyInstance) {
       return reply.status(201).send({ especificMeal });
     },
   );
-  // Deve ser possivel listar todas as refeições de um usuario
   app.get("/", { preHandler: [checkSessionIdExist] }, async (request) => {
     const { sessionId } = request.cookies;
 
@@ -67,9 +65,8 @@ export async function mealsRoutes(app: FastifyInstance) {
 
     return { allMeals };
   });
-  // Deve ser possivel retornar metricas do usuario
   app.get(
-    "/metricstestroute/:id",
+    "/usermetrics/:id",
     { preHandler: [checkSessionIdExist] },
     async (request, reply) => {
       const { sessionId } = request.cookies;
@@ -101,7 +98,6 @@ export async function mealsRoutes(app: FastifyInstance) {
       });
     },
   );
-  // Deve ser capaz de alterar os dados de uma refeição
   app.put(
     "/:id",
     { preHandler: [checkSessionIdExist] },
@@ -142,8 +138,6 @@ export async function mealsRoutes(app: FastifyInstance) {
       return reply.status(204).send();
     },
   );
-
-  // Deve ser capaz de deletar uma refeição
   app.delete(
     "/:id",
     { preHandler: [checkSessionIdExist] },
